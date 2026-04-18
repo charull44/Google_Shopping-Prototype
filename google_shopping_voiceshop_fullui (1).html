@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Google Shopping VoiceShop — Full UI Prototype</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Google Sans','Segoe UI',sans-serif}
+
+:root{
+  --color-background-primary:#ffffff;
+  --color-background-secondary:#f8f9fa;
+  --color-background-tertiary:#f1f3f4;
+  --color-text-primary:#202124;
+  --color-text-secondary:#5f6368;
+  --color-text-tertiary:#9aa0a6;
+  --color-border-tertiary:rgba(0,0,0,0.1);
+  --color-border-secondary:rgba(0,0,0,0.18);
+  --color-border-primary:rgba(0,0,0,0.28);
+  --border-radius-md:8px;
+  --border-radius-lg:12px;
+  --border-radius-xl:16px;
+}
+
+@media(prefers-color-scheme:dark){
+  :root{
+    --color-background-primary:#1e1e1e;
+    --color-background-secondary:#2a2a2a;
+    --color-background-tertiary:#111111;
+    --color-text-primary:#e8eaed;
+    --color-text-secondary:#9aa0a6;
+    --color-text-tertiary:#5f6368;
+    --color-border-tertiary:rgba(255,255,255,0.08);
+    --color-border-secondary:rgba(255,255,255,0.15);
+    --color-border-primary:rgba(255,255,255,0.25);
+  }
+}
+
+body{
+  background:var(--color-background-tertiary);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:32px 16px 64px;
+}
+
+.page-header{
+  text-align:center;
+  margin-bottom:24px;
+}
+.page-header .proto-badge{
+  display:inline-block;
+  background:#E6F1FB;
+  color:#185FA5;
+  font-size:11px;
+  font-weight:500;
+  padding:3px 12px;
+  border-radius:20px;
+  margin-bottom:10px;
+  letter-spacing:0.3px;
+}
+.page-header h1{
+  font-size:24px;
+  font-weight:500;
+  color:var(--color-text-primary);
+  margin-bottom:4px;
+}
+.page-header p{
+  font-size:13px;
+  color:var(--color-text-secondary);
+}
+
+.gs-wrap{
+  width:100%;
+  max-width:700px;
+  border:0.5px solid var(--color-border-tertiary);
+  border-radius:18px;
+  overflow:hidden;
+  background:var(--color-background-primary);
+}
+
+/* ── Header ── */
+.gs-header{background:#4285F4;padding:14px 20px 0}
+.gs-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.gs-logo{display:flex;align-items:center;gap:7px}
+.gs-logo-text{font-size:20px;font-weight:500;color:#fff;letter-spacing:-0.5px}
+.gs-voice-badge{background:#34A853;color:#fff;font-size:9px;padding:2px 8px;border-radius:8px;font-weight:500;margin-left:2px}
+.gs-nav{display:flex;gap:5px}
+.gs-nav-item{font-size:12px;color:rgba(255,255,255,0.75);padding:4px 10px;border-radius:20px;cursor:pointer;transition:background 0.15s}
+.gs-nav-item:hover,.gs-nav-item.active{background:rgba(255,255,255,0.2);color:#fff}
+.gs-cart-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:none;border-radius:20px;padding:6px 14px;cursor:pointer;color:#fff;font-size:13px;transition:background 0.15s}
+.gs-cart-btn:hover{background:rgba(255,255,255,0.25)}
+.gs-cart-count{background:#EA4335;color:#fff;font-size:10px;font-weight:500;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+.gs-searchbar{background:#fff;border-radius:12px 12px 0 0;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.gs-search-input{flex:1;border:none;outline:none;font-size:14px;color:#202124;background:transparent}
+.gs-search-input::placeholder{color:#9aa0a6}
+.wave-wrap{display:none;align-items:center;gap:3px;height:16px}
+.wave-bar{width:3px;border-radius:2px;background:#EA4335;animation:wave 0.6s ease-in-out infinite}
+.wave-bar:nth-child(2){animation-delay:0.1s}
+.wave-bar:nth-child(3){animation-delay:0.2s;height:12px!important}
+.wave-bar:nth-child(4){animation-delay:0.1s}
+@keyframes wave{0%,100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
+.gs-mic-ring{width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s,transform 0.15s;flex-shrink:0}
+.gs-mic-ring.idle{background:#E6F1FB}
+.gs-mic-ring.listening{background:#EA4335;animation:gspulse 0.9s ease-in-out infinite}
+.gs-mic-ring.done{background:#34A853}
+@keyframes gspulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+/* ── Body ── */
+.gs-body{padding:16px 20px}
+.gs-section-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:0.6px;text-transform:uppercase;margin-bottom:10px}
+
+/* Home chips */
+.gs-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.gs-chip{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--color-text-secondary);cursor:pointer;transition:all 0.15s;white-space:nowrap}
+.gs-chip:hover{border-color:#4285F4;color:#185FA5;background:#E6F1FB}
+
+/* Assistant bubble */
+.gs-assistant-bubble{background:#E6F1FB;border-radius:4px 12px 12px 12px;padding:10px 14px;margin-bottom:14px;display:none}
+.gs-assistant-bubble.show{display:block}
+.gs-assistant-name{font-size:10px;font-weight:500;color:#185FA5;margin-bottom:3px;display:flex;align-items:center;gap:5px}
+.gs-assistant-dot{width:7px;height:7px;border-radius:50%;background:#4285F4;animation:gspulse 1s ease-in-out infinite}
+.gs-assistant-text{font-size:13px;color:#0C447C;line-height:1.5}
+
+/* Filters */
+.gs-filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.gs-filter{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--color-text-secondary);cursor:pointer;transition:all 0.15s}
+.gs-filter.active{background:#E6F1FB;border-color:#4285F4;color:#185FA5}
+
+/* Products grid */
+.gs-products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+@media(min-width:480px){.gs-products{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.gs-prod-card{border:0.5px solid var(--color-border-tertiary);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color 0.15s;background:var(--color-background-primary)}
+.gs-prod-card:hover{border-color:var(--color-border-secondary)}
+.gs-prod-card.selected{border:2px solid #4285F4}
+.gs-prod-img{height:80px;display:flex;align-items:center;justify-content:center;font-size:32px}
+.gs-prod-body{padding:8px 10px 10px}
+.gs-prod-name{font-size:12px;font-weight:500;color:var(--color-text-primary);line-height:1.3;margin-bottom:2px}
+.gs-prod-brand{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px}
+.gs-prod-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.gs-prod-price{font-size:13px;font-weight:500;color:#27500A}
+.gs-prod-stars{font-size:10px;color:var(--color-text-tertiary)}
+.gs-prod-badge{font-size:9px;padding:2px 6px;border-radius:8px;margin-top:3px;display:inline-block}
+.badge-fast{background:#EAF3DE;color:#27500A}
+.badge-deal{background:#FAEEDA;color:#633806}
+.badge-top{background:#E6F1FB;color:#0C447C}
+.gs-add-btn{width:100%;margin-top:8px;background:#4285F4;color:#fff;border:none;border-radius:8px;padding:7px;font-size:11px;font-weight:500;cursor:pointer;transition:opacity 0.15s}
+.gs-add-btn:hover{opacity:0.88}
+.gs-add-btn.added{background:#34A853}
+
+/* Cart */
+.gs-cart-panel{border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:14px;margin-bottom:14px;background:var(--color-background-secondary);display:none}
+.gs-cart-panel.show{display:block}
+.gs-cart-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.gs-cart-item:last-child{border-bottom:none}
+.gs-cart-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);flex-shrink:0}
+.gs-cart-info{flex:1}
+.gs-cart-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
+.gs-cart-price{font-size:12px;color:#27500A}
+.gs-cart-remove{background:none;border:none;cursor:pointer;font-size:14px;color:var(--color-text-tertiary);padding:4px}
+.gs-cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:0.5px solid var(--color-border-secondary)}
+.gs-cart-total-label{font-size:13px;color:var(--color-text-secondary)}
+.gs-cart-total-amt{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+
+/* Payment */
+.gs-pay-row{display:flex;gap:8px;margin-bottom:14px}
+.gs-pay-option{flex:1;border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all 0.15s;font-size:11px;color:var(--color-text-secondary)}
+.gs-pay-option:hover,.gs-pay-option.chosen{border-color:#4285F4;background:#E6F1FB;color:#185FA5}
+.gs-pay-icon{width:22px;height:22px}
+
+/* Buttons */
+.gs-btn-row{display:flex;gap:8px}
+.gs-btn-buy{flex:1;background:#4285F4;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:500;cursor:pointer;transition:opacity 0.15s}
+.gs-btn-buy:hover{opacity:0.9}
+.gs-btn-voice{background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:10px;padding:12px 16px;cursor:pointer;color:var(--color-text-secondary);font-size:13px;transition:all 0.15s;white-space:nowrap}
+.gs-btn-voice:hover{border-color:#4285F4;color:#4285F4}
+
+/* Empty cart */
+.gs-empty-cart{text-align:center;padding:12px;font-size:13px;color:var(--color-text-tertiary);display:none}
+.gs-empty-cart.show{display:block}
+
+/* Success */
+.gs-success{text-align:center;padding:28px 20px;display:none}
+.gs-success.show{display:block}
+.gs-success-ring{width:64px;height:64px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.gs-tracking{background:var(--color-background-secondary);border-radius:10px;padding:14px;margin:16px 0 8px;text-align:left}
+.gs-track-bar{height:5px;background:var(--color-border-tertiary);border-radius:4px;margin:10px 0 5px;overflow:hidden}
+.gs-track-fill{height:5px;background:#4285F4;border-radius:4px;width:0;transition:width 1.4s ease}
+.gs-track-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-tertiary)}
+.gs-order-detail{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+.gs-order-label{color:var(--color-text-secondary)}
+.gs-order-val{color:var(--color-text-primary);font-weight:500}
+
+/* Intro card */
+.intro-card{background:var(--color-background-secondary);border-radius:12px;padding:16px;text-align:center}
+.intro-card p{font-size:13px;color:var(--color-text-secondary);margin-bottom:3px}
+.intro-card span{font-size:11px;color:var(--color-text-tertiary)}
+
+/* Footer */
+.page-footer{margin-top:24px;text-align:center;font-size:11px;color:var(--color-text-tertiary)}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="proto-badge">MBA Assignment Prototype · Topic 30</div>
+  <h1>Google Shopping VoiceShop</h1>
+  <p>Interactive proof-of-concept — Voice-enabled end-to-end shopping experience</p>
+</div>
+
+<div class="gs-wrap">
+
+  <!-- Header -->
+  <div class="gs-header">
+    <div class="gs-topbar">
+      <div class="gs-logo">
+        <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="rgba(255,255,255,0.15)"/><text x="11" y="15.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="sans-serif">G</text></svg>
+        <span class="gs-logo-text">Google <span style="color:#FBBC04">Shop</span></span>
+        <span class="gs-voice-badge">Voice</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="gs-nav">
+          <span class="gs-nav-item active">Home</span>
+          <span class="gs-nav-item">Deals</span>
+          <span class="gs-nav-item">Orders</span>
+        </div>
+        <button class="gs-cart-btn" onclick="toggleCartView()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 1h2l2.4 7.4a1 1 0 00.96.6h5.28a1 1 0 00.96-.72L14 4H4" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="14" r="1" fill="#fff"/><circle cx="12" cy="14" r="1" fill="#fff"/></svg>
+          Cart
+          <span class="gs-cart-count" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+    <div class="gs-searchbar">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="#9AA0A6" stroke-width="1.2"/><path d="M11 11l3 3" stroke="#9AA0A6" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <input class="gs-search-input" id="searchInput" placeholder='Try: "running shoes under ₹3000"' onkeydown="if(event.key==='Enter')doSearch(this.value)"/>
+      <div class="wave-wrap" id="waveArea">
+        <div class="wave-bar" style="height:8px"></div>
+        <div class="wave-bar" style="height:14px"></div>
+        <div class="wave-bar" style="height:12px"></div>
+        <div class="wave-bar" style="height:10px"></div>
+        <div class="wave-bar" style="height:6px"></div>
+      </div>
+      <button class="gs-mic-ring idle" id="micBtn" onclick="startVoice()">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="5" y="1" width="5" height="8" rx="2.5" fill="#4285F4"/><path d="M2 7a5.5 5.5 0 0011 0" stroke="#4285F4" stroke-width="1.2" stroke-linecap="round" fill="none"/><line x1="7.5" y1="13" x2="7.5" y2="14.5" stroke="#4285F4" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="14.5" x2="10" y2="14.5" stroke="#4285F4" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="gs-body">
+
+    <!-- Home View -->
+    <div id="homeView">
+      <div class="gs-section-title" style="margin-bottom:8px">Voice commands — tap to try</div>
+      <div class="gs-chips">
+        <div class="gs-chip" onclick="simulateVoice('running shoes under 3000')">🎤 Running shoes under ₹3000</div>
+        <div class="gs-chip" onclick="simulateVoice('best wireless headphones')">🎤 Best wireless headphones</div>
+        <div class="gs-chip" onclick="simulateVoice('organic olive oil fast delivery')">🎤 Organic olive oil, fast delivery</div>
+        <div class="gs-chip" onclick="simulateVoice('smartphone under 15000')">🎤 Smartphone under ₹15,000</div>
+        <div class="gs-chip" onclick="simulateVoice('yoga mat premium')">🎤 Premium yoga mat</div>
+        <div class="gs-chip" onclick="simulateVoice('coffee maker home')">🎤 Coffee maker for home</div>
+      </div>
+      <div class="intro-card">
+        <p>Google Shopping Voice — MBA Prototype · Topic 30</p>
+        <span>Tap a voice chip above or click the mic icon to begin the shopping demo</span>
+      </div>
+    </div>
+
+    <!-- Results View -->
+    <div id="resultsView" style="display:none">
+      <div class="gs-assistant-bubble" id="assistantBubble">
+        <div class="gs-assistant-name"><div class="gs-assistant-dot"></div>Google Assistant</div>
+        <div class="gs-assistant-text" id="assistantText"></div>
+      </div>
+      <div class="gs-filters" id="filterRow"></div>
+      <div class="gs-section-title" id="resultLabel"></div>
+      <div class="gs-products" id="productGrid"></div>
+
+      <div class="gs-cart-panel" id="cartPanel">
+        <div class="gs-section-title">Your cart</div>
+        <div id="cartItems"></div>
+        <div class="gs-cart-total-row">
+          <span class="gs-cart-total-label">Total</span>
+          <span class="gs-cart-total-amt" id="cartTotal">₹0</span>
+        </div>
+      </div>
+      <div class="gs-empty-cart" id="emptyCart">Cart is empty — add a product above</div>
+
+      <div style="margin-bottom:12px">
+        <div class="gs-section-title" style="margin-bottom:8px">Pay with</div>
+        <div class="gs-pay-row">
+          <div class="gs-pay-option chosen" id="pay0" onclick="choosePay(0)">
+            <svg class="gs-pay-icon" viewBox="0 0 22 22" fill="none"><rect x="1" y="4" width="20" height="14" rx="3" stroke="#4285F4" stroke-width="1.2"/><path d="M1 8h20" stroke="#4285F4" stroke-width="1.2"/><rect x="4" y="12" width="5" height="2" rx="1" fill="#4285F4"/></svg>
+            Google Pay
+          </div>
+          <div class="gs-pay-option" id="pay1" onclick="choosePay(1)">
+            <svg class="gs-pay-icon" viewBox="0 0 22 22" fill="none"><rect x="1" y="4" width="20" height="14" rx="3" stroke="#9AA0A6" stroke-width="1.2"/><circle cx="8" cy="11" r="4" stroke="#EA4335" stroke-width="1.2"/><circle cx="14" cy="11" r="4" stroke="#FBBC04" stroke-width="1.2"/></svg>
+            Credit card
+          </div>
+          <div class="gs-pay-option" id="pay2" onclick="choosePay(2)">
+            <svg class="gs-pay-icon" viewBox="0 0 22 22" fill="none"><rect x="3" y="2" width="16" height="18" rx="3" stroke="#9AA0A6" stroke-width="1.2"/><path d="M7 8h8M7 12h5" stroke="#9AA0A6" stroke-width="1.2" stroke-linecap="round"/></svg>
+            UPI / Net banking
+          </div>
+        </div>
+      </div>
+
+      <div class="gs-btn-row">
+        <button class="gs-btn-buy" id="buyNowBtn" onclick="placeOrder()">Place order via Google Pay</button>
+        <button class="gs-btn-voice" onclick="goHome()">&#8592; New search</button>
+      </div>
+    </div>
+
+    <!-- Success View -->
+    <div class="gs-success" id="successView">
+      <div class="gs-success-ring">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M5 15l7 7 13-13" stroke="#3B6D11" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-size:17px;font-weight:500;color:var(--color-text-primary);margin-bottom:5px">Order confirmed!</div>
+      <div style="font-size:12px;color:var(--color-text-secondary)">Google Pay charged &middot; SMS confirmation sent to your number</div>
+      <div class="gs-tracking" id="trackingBox"></div>
+      <div class="gs-track-bar"><div class="gs-track-fill" id="trackFill"></div></div>
+      <div class="gs-track-labels">
+        <span>Confirmed</span><span>Packed</span><span>Shipped</span><span>Out for delivery</span><span>Delivered</span>
+      </div>
+      <div style="margin-top:20px;width:100%;max-width:320px;margin-left:auto;margin-right:auto">
+        <button class="gs-btn-buy" style="width:100%" onclick="goHome()">Shop again</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-footer">
+  MBA Assignment · Prototype Showcase · Topic 30: Voice Shopping – Google<br>
+  Interactive prototype built as Proof of Concept (PoC)
+</div>
+
+<script>
+const DB={
+  shoes:[
+    {name:"Nike Air Zoom Pegasus 40",brand:"Nike",price:2799,rating:"4.5",reviews:"2.3k",delivery:"2-day delivery",badge:"deal",bLabel:"Best deal",emoji:"👟",bg:"#EAF3DE"},
+    {name:"Adidas Ultraboost 22",brand:"Adidas",price:3299,rating:"4.7",reviews:"1.8k",delivery:"1-day delivery",badge:"fast",bLabel:"Express",emoji:"👟",bg:"#E6F1FB"},
+    {name:"Puma Velocity Nitro 2",brand:"Puma",price:2199,rating:"4.3",reviews:"980",delivery:"3-day delivery",badge:"deal",bLabel:"Budget pick",emoji:"👟",bg:"#FAEEDA"},
+    {name:"Skechers Go Run 7",brand:"Skechers",price:1899,rating:"4.2",reviews:"4.1k",delivery:"2-day delivery",badge:"top",bLabel:"Popular",emoji:"👟",bg:"#FBEAF0"}
+  ],
+  headphones:[
+    {name:"Sony WH-1000XM5",brand:"Sony",price:29990,rating:"4.9",reviews:"12k",delivery:"1-day delivery",badge:"top",bLabel:"Premium",emoji:"🎧",bg:"#E6F1FB"},
+    {name:"JBL Tune 760NC",brand:"JBL",price:5999,rating:"4.5",reviews:"6.4k",delivery:"2-day delivery",badge:"deal",bLabel:"Best deal",emoji:"🎧",bg:"#EAF3DE"},
+    {name:"boAt Rockerz 550",brand:"boAt",price:1799,rating:"4.3",reviews:"21k",delivery:"Same day",badge:"fast",bLabel:"Express",emoji:"🎧",bg:"#FAEEDA"},
+    {name:"Bose QuietComfort 45",brand:"Bose",price:24990,rating:"4.8",reviews:"3.2k",delivery:"2-day delivery",badge:"top",bLabel:"Top rated",emoji:"🎧",bg:"#FBEAF0"}
+  ],
+  oil:[
+    {name:"Fortune Sunlite 5L",brand:"Fortune",price:699,rating:"4.6",reviews:"5.1k",delivery:"Same day",badge:"fast",bLabel:"Express",emoji:"🫙",bg:"#FAEEDA"},
+    {name:"Saffola Gold 5L",brand:"Saffola",price:749,rating:"4.8",reviews:"8.2k",delivery:"Same day",badge:"top",bLabel:"Top rated",emoji:"🫙",bg:"#EAF3DE"},
+    {name:"Borges Extra Virgin 1L",brand:"Borges",price:549,rating:"4.4",reviews:"3k",delivery:"2-day delivery",badge:"deal",bLabel:"Best value",emoji:"🫙",bg:"#E6F1FB"},
+    {name:"DiSano Olive Oil 2L",brand:"DiSano",price:899,rating:"4.5",reviews:"2.1k",delivery:"Same day",badge:"fast",bLabel:"Organic",emoji:"🫙",bg:"#FBEAF0"}
+  ],
+  phone:[
+    {name:"Redmi Note 13 Pro",brand:"Xiaomi",price:24999,rating:"4.5",reviews:"18k",delivery:"1-day delivery",badge:"deal",bLabel:"Best seller",emoji:"📱",bg:"#E6F1FB"},
+    {name:"Samsung Galaxy M34",brand:"Samsung",price:18999,rating:"4.4",reviews:"9.3k",delivery:"2-day delivery",badge:"top",bLabel:"Popular",emoji:"📱",bg:"#EAF3DE"},
+    {name:"realme 12 Pro",brand:"realme",price:22999,rating:"4.3",reviews:"4.5k",delivery:"Same day",badge:"fast",bLabel:"Express",emoji:"📱",bg:"#FAEEDA"},
+    {name:"POCO X6 Pro",brand:"POCO",price:21999,rating:"4.6",reviews:"7.1k",delivery:"1-day delivery",badge:"deal",bLabel:"Value king",emoji:"📱",bg:"#FBEAF0"}
+  ],
+  yoga:[
+    {name:"Boldfit Yoga Mat 6mm",brand:"Boldfit",price:799,rating:"4.4",reviews:"12k",delivery:"Same day",badge:"fast",bLabel:"Express",emoji:"🧘",bg:"#EAF3DE"},
+    {name:"Lifelong LLYM02 Mat",brand:"Lifelong",price:999,rating:"4.5",reviews:"8.7k",delivery:"2-day delivery",badge:"top",bLabel:"Top rated",emoji:"🧘",bg:"#E6F1FB"},
+    {name:"Strauss Anti-Slip 6mm",brand:"Strauss",price:1199,rating:"4.6",reviews:"5.2k",delivery:"Same day",badge:"deal",bLabel:"Premium",emoji:"🧘",bg:"#FAEEDA"},
+    {name:"Kobo Yoga Mat 8mm",brand:"Kobo",price:1499,rating:"4.7",reviews:"3.1k",delivery:"3-day delivery",badge:"top",bLabel:"Thick & comfy",emoji:"🧘",bg:"#FBEAF0"}
+  ],
+  coffee:[
+    {name:"Morphy Richards Europa",brand:"Morphy Richards",price:3499,rating:"4.4",reviews:"6.8k",delivery:"2-day delivery",badge:"deal",bLabel:"Best deal",emoji:"☕",bg:"#FAEEDA"},
+    {name:"Philips HD7432 Drip",brand:"Philips",price:2499,rating:"4.5",reviews:"9.1k",delivery:"Same day",badge:"fast",bLabel:"Express",emoji:"☕",bg:"#E6F1FB"},
+    {name:"Instacuppa Brewer",brand:"Instacuppa",price:4999,rating:"4.6",reviews:"2.3k",delivery:"2-day delivery",badge:"top",bLabel:"Premium",emoji:"☕",bg:"#EAF3DE"},
+    {name:"Prestige PCMD 1.0",brand:"Prestige",price:1899,rating:"4.3",reviews:"7.4k",delivery:"1-day delivery",badge:"deal",bLabel:"Budget pick",emoji:"☕",bg:"#FBEAF0"}
+  ]
+};
+
+const RESPONSES={
+  shoes:"Found 4 running shoes matching your search. Tap to add to cart, then place your order.",
+  headphones:"Here are 4 top headphones with great reviews. Select any to add to your cart.",
+  oil:"Found 4 oil options — 3 with same-day delivery. Great for quick shopping!",
+  phone:"4 smartphones under ₹25,000 with strong ratings. Tap any card to add to cart.",
+  yoga:"Here are 4 premium yoga mats available near you. Same-day options highlighted!",
+  coffee:"Found 4 coffee makers for home use — filtered by best ratings. Happy brewing!"
+};
+
+const FILTERS={
+  shoes:["All","Under ₹2500","Nike","Adidas","Fast delivery"],
+  headphones:["All","Under ₹6000","Sony","JBL","Noise cancelling"],
+  oil:["All","Same day","Organic","Under ₹600","5L pack"],
+  phone:["All","Under ₹20k","5G","Samsung","Fast delivery"],
+  yoga:["All","Anti-slip","6mm+","Same day","Under ₹1000"],
+  coffee:["All","Drip type","Under ₹3000","Same day","Premium"]
+};
+
+let cart={},currentKey='shoes',currentProducts=[],activeFilter='All',chosenPay=0;
+
+function goHome(){
+  cart={};currentKey='shoes';activeFilter='All';chosenPay=0;
+  updateCartCount();
+  document.getElementById('homeView').style.display='';
+  document.getElementById('resultsView').style.display='none';
+  document.getElementById('successView').className='gs-success';
+  document.getElementById('searchInput').value='';
+  document.getElementById('micBtn').className='gs-mic-ring idle';
+  document.getElementById('waveArea').style.display='none';
+  document.getElementById('buyNowBtn').textContent='Place order via Google Pay';
+  [0,1,2].forEach(i=>document.getElementById('pay'+i).className='gs-pay-option'+(i===0?' chosen':''));
+}
+
+function toggleCartView(){
+  if(document.getElementById('resultsView').style.display==='none')return;
+  renderCart();
+}
+
+function startVoice(){
+  document.getElementById('micBtn').className='gs-mic-ring listening';
+  document.getElementById('searchInput').placeholder='Listening...';
+  document.getElementById('waveArea').style.display='flex';
+  const demos=['running shoes under 3000','best wireless headphones','organic olive oil fast delivery','smartphone under 15000','yoga mat premium','coffee maker home'];
+  setTimeout(()=>simulateVoice(demos[Math.floor(Math.random()*demos.length)]),1100);
+}
+
+function simulateVoice(cmd){
+  document.getElementById('micBtn').className='gs-mic-ring listening';
+  document.getElementById('waveArea').style.display='flex';
+  const inp=document.getElementById('searchInput');
+  inp.value='';let i=0;
+  const t=setInterval(()=>{
+    if(i<cmd.length){inp.value+=cmd[i++];}
+    else{
+      clearInterval(t);
+      document.getElementById('micBtn').className='gs-mic-ring done';
+      document.getElementById('waveArea').style.display='none';
+      setTimeout(()=>doSearch(cmd),500);
+    }
+  },42);
+}
+
+function doSearch(q){
+  q=q.toLowerCase();
+  if(q.includes('shoe')||q.includes('running')||q.includes('sneaker'))currentKey='shoes';
+  else if(q.includes('head')||q.includes('earphone')||q.includes('bass'))currentKey='headphones';
+  else if(q.includes('oil')||q.includes('olive'))currentKey='oil';
+  else if(q.includes('phone')||q.includes('smartphone')||q.includes('mobile'))currentKey='phone';
+  else if(q.includes('yoga')||q.includes('mat'))currentKey='yoga';
+  else if(q.includes('coffee'))currentKey='coffee';
+  else currentKey='shoes';
+  currentProducts=DB[currentKey];activeFilter='All';
+  showResults();
+}
+
+function showResults(){
+  document.getElementById('homeView').style.display='none';
+  document.getElementById('resultsView').style.display='';
+  document.getElementById('successView').className='gs-success';
+  const bub=document.getElementById('assistantBubble');
+  bub.className='gs-assistant-bubble';
+  setTimeout(()=>{bub.className='gs-assistant-bubble show';document.getElementById('assistantText').textContent=RESPONSES[currentKey];},80);
+  const fr=document.getElementById('filterRow');
+  fr.innerHTML='';
+  FILTERS[currentKey].forEach(f=>{
+    const d=document.createElement('div');
+    d.className='gs-filter'+(f===activeFilter?' active':'');
+    d.textContent=f;d.onclick=()=>{activeFilter=f;showResults();};
+    fr.appendChild(d);
+  });
+  document.getElementById('resultLabel').textContent=currentProducts.length+' products found';
+  renderProducts();renderCart();
+}
+
+function renderProducts(){
+  const grid=document.getElementById('productGrid');
+  grid.innerHTML='';
+  currentProducts.forEach((p,i)=>{
+    const inCart=!!cart[i];
+    const bc=p.badge==='fast'?'badge-fast':p.badge==='top'?'badge-top':'badge-deal';
+    grid.innerHTML+=`<div class="gs-prod-card${inCart?' selected':''}" id="card${i}">
+      <div class="gs-prod-img" style="background:${p.bg}">${p.emoji}</div>
+      <div class="gs-prod-body">
+        <div class="gs-prod-name">${p.name}</div>
+        <div class="gs-prod-brand">${p.brand}</div>
+        <span class="gs-prod-badge ${bc}">${p.bLabel}</span>
+        <div class="gs-prod-bottom">
+          <div class="gs-prod-price">&#8377;${p.price.toLocaleString('en-IN')}</div>
+          <div class="gs-prod-stars">&#9733;${p.rating} (${p.reviews})</div>
+        </div>
+        <div style="font-size:10px;color:var(--color-text-tertiary);margin-top:3px">${p.delivery}</div>
+        <button class="gs-add-btn${inCart?' added':''}" onclick="addToCart(${i})">${inCart?'&#10003; Added':'+ Add to cart'}</button>
+      </div>
+    </div>`;
+  });
+}
+
+function addToCart(i){
+  if(cart[i]){delete cart[i];}else{cart[i]=1;}
+  updateCartCount();renderProducts();renderCart();
+}
+
+function renderCart(){
+  const items=document.getElementById('cartItems');
+  items.innerHTML='';let total=0;
+  const keys=Object.keys(cart);
+  keys.forEach(k=>{
+    const p=currentProducts[k];if(!p)return;
+    total+=p.price;
+    items.innerHTML+=`<div class="gs-cart-item">
+      <div class="gs-cart-icon">${p.emoji}</div>
+      <div class="gs-cart-info"><div class="gs-cart-name">${p.name}</div><div class="gs-cart-price">&#8377;${p.price.toLocaleString('en-IN')}</div></div>
+      <button class="gs-cart-remove" onclick="addToCart(${k})">&#x2715;</button>
+    </div>`;
+  });
+  document.getElementById('cartTotal').textContent='&#8377;'+total.toLocaleString('en-IN');
+  const panel=document.getElementById('cartPanel');
+  const ec=document.getElementById('emptyCart');
+  if(keys.length>0){panel.className='gs-cart-panel show';ec.className='gs-empty-cart';}
+  else{panel.className='gs-cart-panel';ec.className='gs-empty-cart show';}
+}
+
+function updateCartCount(){document.getElementById('cartCount').textContent=Object.keys(cart).length;}
+
+function choosePay(n){
+  chosenPay=n;
+  [0,1,2].forEach(i=>document.getElementById('pay'+i).className='gs-pay-option'+(i===n?' chosen':''));
+  const labels=['Google Pay','Credit card','UPI / Net banking'];
+  document.getElementById('buyNowBtn').textContent='Place order via '+labels[n];
+}
+
+function placeOrder(){
+  const keys=Object.keys(cart);
+  if(keys.length===0){alert('Please add at least one item to your cart first.');return;}
+  let total=0;
+  keys.forEach(k=>{if(currentProducts[k])total+=currentProducts[k].price;});
+  const orderId='GS'+Math.floor(Math.random()*900000+100000);
+  const payLabels=['Google Pay','Credit card','UPI'];
+  const itemNames=keys.map(k=>currentProducts[k]?currentProducts[k].name:'').filter(Boolean).join(', ');
+  document.getElementById('trackingBox').innerHTML=`
+    <div class="gs-order-detail"><span class="gs-order-label">Order ID</span><span class="gs-order-val">${orderId}</span></div>
+    <div class="gs-order-detail"><span class="gs-order-label">Items</span><span class="gs-order-val" style="max-width:200px;text-align:right;font-size:11px">${itemNames}</span></div>
+    <div class="gs-order-detail"><span class="gs-order-label">Total paid</span><span class="gs-order-val">&#8377;${total.toLocaleString('en-IN')}</span></div>
+    <div class="gs-order-detail"><span class="gs-order-label">Payment</span><span class="gs-order-val">${payLabels[chosenPay]}</span></div>
+    <div class="gs-order-detail"><span class="gs-order-label">Est. delivery</span><span class="gs-order-val">2–3 business days</span></div>`;
+  document.getElementById('homeView').style.display='none';
+  document.getElementById('resultsView').style.display='none';
+  const sv=document.getElementById('successView');
+  sv.className='gs-success show';
+  setTimeout(()=>{document.getElementById('trackFill').style.width='22%';},400);
+}
+</script>
+</body>
+</html>
