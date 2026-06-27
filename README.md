@@ -217,3 +217,5 @@ This project is intended for educational, learning, and portfolio purposes.
 ---
 
 > **"The future of shopping isn't just clicking—it's simply speaking."** 🎤🛍️
+
+_Last updated for GitHub profile improvements._
